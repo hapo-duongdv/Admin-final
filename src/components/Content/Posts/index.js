@@ -1,25 +1,25 @@
-import React, { Component } from 'react';
-import axios from 'axios';
+import React, { Component } from 'react'
+import { Table, Button, Pagination, PaginationItem, PaginationLink, Form, Input } from 'reactstrap';
 import TableRow from './TableRow';
-import { Button, Table, Pagination, PaginationItem, PaginationLink, Form, Input } from 'reactstrap';
+import axios from 'axios';
 import '../../../css/member.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
-import { withRouter } from 'react-router-dom';
 
-
-export default class Members extends Component {
+export default class Posts extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            persons: [],
-            pagePerson: [],
+            posts: [],
+            currentUser: [],
+            pagePost: [],
             search: "",
             searchResult: [],
             total: 0,
             searchBy: ""
         };
     }
+
     searchOnChange = (event) => {
         this.setState({
             search: event.target.value.substr(0, 20)
@@ -37,82 +37,106 @@ export default class Members extends Component {
         const AuthStr = 'Bearer ' + token;
         try {
             e.preventDefault();
-            if (this.state.search !== "") {
-                const res = await axios.get(`http://localhost:4000/users/search/${this.state.searchBy}?query=${this.state.search}`);
-                if (res.status === 200) {
-                    if (res.data.length !== 0) {
-                        this.setState({
-                            searchResult: res.data,
-                            total: res.data.length
-                        });
-                    } else {
-                        alert("not found")
-                        window.location.href = "/members"
+            if (this.state.searchBy.length !== 0) {
+                if (this.state.search !== "") {
+                    const res = await axios.get(`http://localhost:4000/posts/search/${this.state.searchBy}?query=${this.state.search}`);
+                    if (res.status === 200) {
+                        if (res.data.length !== 0) {
+                            this.setState({
+                                searchResult: res.data,
+                                total: res.data.length
+                            });
+                        } else {
+                            alert("not found")
+                            window.location.href = "/posts"
+                        }
                     }
+                    const response = await axios.get(`http://localhost:4000/posts/searchPage/${this.state.searchBy}/${this.state.search}?page=1`,
+                        { headers: { 'Authorization': AuthStr } })
+                    this.setState({ pagePost: response.data })
                 }
-                const response = await axios.get(`http://localhost:4000/users/searchPage/${this.state.searchBy}/${this.state.search}?page=1`,
-                    { headers: { 'Authorization': AuthStr } })
-                console.log(res.data)
-                this.setState({ pagePerson: response.data })
+                else {
+                    window.location.href = "/posts"
+                }
+            } else {
+                const res = await axios.get(`http://localhost:4000/tasks/searchOther/${this.state.search}`, { headers: { 'Authorization': AuthStr } })
+                if (res.status == 200) {
+                    this.setState({ posts: res.data });
+                }
+                else {
+                    alert("not found")
+                    window.location.href = "/tasks"
+                }
             }
-            else {
-                window.location.href = "/members"
-            }
+
         } catch (err) {
             alert(err)
         }
 
     }
 
+
     componentDidMount() {
         const token = localStorage.getItem("jwt_token");
         const AuthStr = 'Bearer ' + token;
-        axios.get('http://localhost:4000/users', { headers: { 'Authorization': AuthStr } })
+        axios.get('http://localhost:4000/posts', { headers: { 'Authorization': AuthStr } })
             .then(response => {
-                this.setState({ persons: response.data });
+                this.setState({ posts: response.data });
             })
             .catch(function (error) {
                 console.log(error);
             })
 
-        axios.get(`http://localhost:4000/users/page?page=1`,
+        axios.get(`http://localhost:4000/posts/page?page=1`,
             { headers: { 'Authorization': AuthStr } }
         ).then(response => {
-            // console.log("res: ", response.data)
-            this.setState({ pagePerson: response.data });
+            this.setState({ pagePost: response.data });
         })
             .catch(function (error) {
                 console.log(error);
             })
 
+        const id = axios.get(`http://localhost:4000/users/me/${token}`, { headers: { 'Authorization': AuthStr } })
+        axios.get(`http://localhost:4000/users//${id}`, { headers: { 'Authorization': AuthStr } })
+            .then(response => {
+                this.setState({ currentUser: response.data });
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
+    }
+
+    tabRow() {
+            return this.state.pagePost.map(function (post, i) {
+                return <TableRow obj={post} key={i} />;
+            });
     }
 
     async pagination(page) {
         const token = localStorage.getItem("jwt_token");
         const AuthStr = 'Bearer ' + token;
         if (this.state.searchResult.length !== 0) {
-            const res = await axios.get(`http://localhost:4000/users/searchPage/${this.state.searchBy}/${this.state.search}?page=${page}`,
+            const res = await axios.get(`http://localhost:4000/posts/searchPage/${this.state.searchBy}/${this.state.search}?page=${page}`,
                 { headers: { 'Authorization': AuthStr } })
-            this.setState({ pagePerson: res.data })
+            this.setState({ pagePost: res.data })
+        }
+        else if (this.state.searchBy.length === 0) {
+            const res = await axios.get(`http://localhost:4000/posts/page/?page=${page}`,
+                { headers: { 'Authorization': AuthStr } })
+            this.setState({ pagePost: res.data })
         }
         else {
-            const res = await axios.get(`http://localhost:4000/users/page/?page=${page}`,
+            const res = await axios.get(`http://localhost:4000/posts/page/?page=${page}`,
                 { headers: { 'Authorization': AuthStr } })
-            this.setState({ pagePerson: res.data })
+            this.setState({ pagePost: res.data })
         }
 
     }
 
-    tabRow() {
-        return this.state.pagePerson.map(function (object, i) {
-            return <TableRow obj={object} key={i}  />;
-        });
-
-    }
 
     render() {
         if (this.state.searchResult.length === 0) {
-            const pageCount = Math.ceil(this.state.persons.length / 3);
+            const pageCount = Math.ceil(this.state.posts.length / 3);
             var listPage = []
             for (var i = 1; i <= pageCount; i++) {
                 listPage.push(i)
@@ -125,11 +149,9 @@ export default class Members extends Component {
                 listPage.push(i)
             }
         }
-        // console.log(this.state.persons)
-
         return (
-            <div className="body">
-                <h3 className="pb-20">Management members</h3>
+            <div className="table body" style={{ maxWidth: "1000px" }}>
+                <h3 className="pb-20">Management Posts</h3>
                 <div className="d-flex search-box ml-auto" style={{ width: "400px", marginTop: "-40px", paddingBottom: "10px" }}>
                     <div style={{ width: "250px" }}>
                         <Form onSubmit={this.fetchSearchResult} style={{ display: "flex", }}>
@@ -137,7 +159,6 @@ export default class Members extends Component {
                             <Button style={{ marginLeft: "-50px", backgroundColor: "white", border: "white", height: "20px", marginTop: "2px" }} ><FontAwesomeIcon color="grey" icon={faSearch} /></Button>
                         </Form>
                     </div>
-
                     <Input type="select"
                         required
                         name="select"
@@ -147,7 +168,7 @@ export default class Members extends Component {
                         onChange={this.searchByOnChange}>
                         <option value="">--Search by--</option>
                         <option>name</option>
-                        <option>address</option>
+                        <option>status</option>
                     </Input>
                 </div>
                 <Table responsive striped>
@@ -155,9 +176,9 @@ export default class Members extends Component {
                         <tr>
                             <th>ID</th>
                             <th>Tên</th>
-                            <th>Email</th>
-                            <th>Số điện thoại</th>
-                            <th>Địa chỉ</th>
+                            <th>Giá</th>
+                            <th>Tình trạng</th>
+                            <th>Đã bán?</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -187,6 +208,6 @@ export default class Members extends Component {
                     </PaginationItem>
                 </Pagination>
             </div>
-        );
+        )
     }
 }

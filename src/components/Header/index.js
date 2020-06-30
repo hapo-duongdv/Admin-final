@@ -14,7 +14,6 @@ class Header extends Component {
     onSearch = (event) => {
         event.preventDefault();
         this.props.history.push(`/search?q=${this.state.search}`)
-        console.log(this.props.history)
     }
     render() {
         return (
@@ -40,8 +39,8 @@ class Header extends Component {
                                 <Input className="form-control mr-sm-2" value={this.state.search} onChange={this.searchOnChange} placeholder="Search..." />
                             </Form>
                             <div className="input-group-append">
-                                <button className="btn btn-navbar" type="submit">
-                                    <i className="fas fa-search" />
+                                <button className="btn btn-navbar" style={{ backgroundColor: "white" }} type="submit">
+                                    <i className="fas fa-search" style={{ marginLeft: "-60px", marginTop: "10px", height: "30px" }} />
                                 </button>
                             </div>
                         </div>
