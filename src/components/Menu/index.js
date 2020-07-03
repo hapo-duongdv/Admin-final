@@ -108,13 +108,16 @@ export default class Menu extends Component {
                                             </p>
                                         </a>
                                     </li>
-                                    </> :<></>}
-                                    <li  className="nav-header">
-                                    <a href="/statistics">
+                                    <li className="nav-item">
+                                        <a href="/statictis" className="nav-link" >
+                                            <i className="nav-icon fas fa-chart-pie" />
                                             <p>
-                                            DAILY STATISTICS
+                                              Daily statictis
                                             </p>
-                                        </a></li>
+                                        </a>
+                                    </li>
+                                    </> :<></>}
+                               
                                     
                                 </ul>
                             </nav>

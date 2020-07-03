@@ -77,7 +77,6 @@ class App extends React.Component {
 
   render() {
     const author = this.state.authedUser;
-    console.log(author)
     return (
       <>
         <Router>
@@ -91,9 +90,12 @@ class App extends React.Component {
               author={this.state.authedUser}
             />
           } />
+          <Route exact path='/' render={() =>
+            <Statistics />
+          } />
 
           <Route path="/search" component={Search} />
-          <Route path="/statistics" component={Statistics} />
+          <Route path="/statictis" component={Statistics} />
           <Route path="/show" component={Show} />
           <Route path="/modalLogin" component={LoginModal} />
           <Route path="/members" render={() => <Members

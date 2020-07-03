@@ -26,10 +26,7 @@ class Header extends Component {
                             <a className="nav-link" data-widget="pushmenu" href="fake_url" role="button"><i className="fas fa-bars" /></a>
                         </li>
                         <li className="nav-item d-none d-sm-inline-block">
-                            <a href="index3.html" className="nav-link">Home</a>
-                        </li>
-                        <li className="nav-item d-none d-sm-inline-block">
-                            <a href="fake_url" className="nav-link">Contact</a>
+                            <a href="/" className="nav-link">Home</a>
                         </li>
                     </ul>
                     {/* SEARCH FORM */}
