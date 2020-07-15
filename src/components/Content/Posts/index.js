@@ -155,7 +155,7 @@ export default class Posts extends Component {
                 <div className="d-flex search-box ml-auto" style={{ width: "400px", marginTop: "-40px", paddingBottom: "10px" }}>
                     <div style={{ width: "250px" }}>
                         <Form onSubmit={this.fetchSearchResult} style={{ display: "flex", }}>
-                            <Input value={this.state.search} onChange={this.searchOnChange} placeholder="  Tìm kiếm..." />
+                            <Input value={this.state.search} onChange={this.searchOnChange} placeholder="  search..." />
                             <Button style={{ marginLeft: "-50px", backgroundColor: "white", border: "white", height: "20px", marginTop: "2px" }} ><FontAwesomeIcon color="grey" icon={faSearch} /></Button>
                         </Form>
                     </div>
